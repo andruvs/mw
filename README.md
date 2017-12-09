@@ -1,23 +1,26 @@
 # mw
-jQuery Modal Windows
+*jQuery Modal Windows*
 
-Плагин для создания модальных окон на сайте на основе jQuery.
+Library for creating modal windows on the site based on jQuery plugin.
 
-## Начало работы
+## Getting Started
 
-Подключите jQuery, mw.js и стили для нужной темы оформления.
+Include the js and css files which you can find in the dist folder.
 
-## Использование
+```
+<link rel="stylesheet" href="dist/mw.default.css" />
+<script src="dist/mw.min.js"></script>
+```
 
-Для создания нового окна необходимо добавить его в менеджер модальных окон. Менеджер позволяет управлять всеми окнами, добавленными на страницу сайта. Также менеджер позволяет задать параметры окна по-умолчанию.
+## Usage
 
-Менеджер доступен через *$.mw*
+Modal windows are controlled by the window manager which is accessible in code via `$.mw`. Each modal window used on the page must be added to the window manager. The window manager allows you to open, close windows, display windows on top of each other, and also set the default parameters.
 
-### Параметры по-умолчанию
+### Default parameters
 
-Если необходимо задать общие параметры окон по-умолчанию, чтобы не добавлять их для каждого окна, то это можно сделать с помощью менеджера. Все окна, добавленные после вызова *$.mw.defaults()*, будут использовать эти параметры как значения по-умолчанию.
+Using the window manager method `$.mw.defaults()`, you can set the common default parameters of the windows so that you do not specify them when creating each window. All windows added after calling `$.mw.defaults()` will use these parameters as default values.
 
-Любой параметр по-умолчанию может быть переопределен, если указать его при добавлении окна в менеджер.
+Any default parameter can be overridden when adding a window to the manager.
 
 ```javascript
 $(function () {
@@ -34,9 +37,9 @@ $(function () {
 });
 ```
 
-### Добавление окон
+### Adding modal windows
 
-Все окна, которые предполагается использовать на странице, необходимо добавить в менеджер:
+To add a window to the manager, use the method `$.mw.add()`
 
 ```javascript
 $(function () {
@@ -64,48 +67,33 @@ $(function () {
 });
 ```
 
-### Параметры окон
+### Settings
 
-###### id {String}
+Option | Type | Default | Description
+------ | ---- | ------- | -----------
+id | string | random | The identifier of the window. Should be unique. Used to open and retrieve a window instance using the manager.
+theme | string | '' | The theme of the window. [Read more](#themes)
+src | string | '' | The path to load the contents of the window. If this parameter is set, the content will be loaded with ajax request when the window is opened. 
+content | jQuery selector &#124; string | '' | If the `src` parameter is not specified, then the `content` will be used as the contents of the window. If `content` is a string, then it will be used as the html of the contents of the window. 
+width | integer &#124; string | 'auto' | The width of the window. If the value of the parameter is a number, then this value is in pixels. String variants are also possible: `'200px'`, `'60%'` 
+height | integer &#124; string | 'auto' | The height of the window. If the value of the parameter is a number, then this value is in pixels. String variants are also possible: `'200px'`, `'60%'`. <br><br>Usually this parameter is not specified. 
+offset | integer &#124; object | 50 | Minimum space between viewport and modal window. Can be set as object `{x: 20, y: 50}`
+title | jQuery selector &#124; string &#124; boolean | true | The title of the window. If the `title` parameter is boolean, then the title will be shown or hidden depending on the value.
+closeContent | jQuery selector &#124; string &#124; boolean | true | Allows to specify custom contents of the window close button. For example `<span class="close-button">Close window</span>`. If the `closeContent` parameter is boolean, then the close button will be shown or hidden depending on the value.
+closeDelay | integer | 0 | Number of seconds of delay before closing the window. When the window is closed, the `mw_opened` class is removed, so it can be used to animate the effect of closing a window using css.
 
-Идентификатор окна. Должен быть уникальным. Используется в дальнейшем для открытия и получения экземпляра окна с помощью менеджера.
+### Methods of window manager
 
-###### theme {String}
-
-Тема окна. Реализуется посредством стилей.
-
-###### src {String}
-
-Путь для загрузки содержимого окна. Если задан, то при открытии окна содержимое окна будет загружено по этом пути посредством ajax запроса. Метод запроса GET или POST определяется автоматически в зависимости от указанных параметров открытия окна.
-
-###### content {jQuery selector, String}
-
-Если *src* не задан, то селектор *content* будет использован в качестве содержимого окна. Если *content* строка, то она будет использована как html содержимого окна.
-
-###### width {Number, String}
-
-Ширина окна по-умолчанию. Может быть просто числом - значение в пикселях, а также возможны строковые варианты: *'200px'*, *'60%'*
-
-###### height {Number, String}
-
-Высота окна. Может быть просто числом - значение в пикселях, а также возможны строковые варианты: *'200px'*, *'60%'*
-
-Обычно не указывается.
-
-###### offset {Number, Object}
-
-Отступ окна от краев окна браузера. Если число, то оно задает одинаковый отступ по вертикали и горизонтали в пикселях. Если передать объект, то можно задать разные отступы по вертикали и горизонтали:
+Methods are called on manager instances `$.mw`:
 
 ```javascript
-offset: {
-    x: 20,
-    y: 50
-}
+$.mw.open('id');
 ```
 
-###### title {jQuery selector, String, Boolean}
+### Opening the window
 
-Заголовок окна. Если *false*, то заголовок по-умолчанию скрыт.
+### Themes
+
 
 ### Открытие окна
 
