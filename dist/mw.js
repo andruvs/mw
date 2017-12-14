@@ -1,6 +1,7 @@
 /**
  * ModalWindow 2.4
  * JQuery plugin for creating modal windows
+ * https://github.com/andruvs/mw
  *
  * Copyright 2016-2017, Andrew Golovchak
  *
