@@ -1,10 +1,10 @@
 /**
- * ModalWindow 2.3
+ * ModalWindow 2.4
  * JQuery plugin for creating modal windows
  *
- * Copyright 2016, Andrew Golovchak
+ * Copyright 2016-2017, Andrew Golovchak
  *
- * Released on: September 29, 2017
+ * Released on: December 9, 2017
  */
 
 (function($){
@@ -17,25 +17,30 @@
     var ModalWindow = function(options)
     {
         this._options = $.extend({
-            'content' : '',
-            'src' : '',
-            'width' : 'auto',
-            'height' : 'auto',
-            'offset' : 50,
-            'theme' : '',
-            'title' : true,
-            'closeContent' : true,
-            'closeDelay' : 0
+            content: '',
+            src: '',
+            width: 'auto',
+            height: 'auto',
+            position: 'auto',
+            offset: 50,
+            theme: '',
+            title: true,
+            closeContent: true,
+            closeDelay: 0,
+            open: null,
+            load: null,
+            close: null,
+            update: null
         }, options);
 
         this.id = '';
-        if (typeof this._options.id == 'string' && this._options.id != '')
+        if (typeof this._options.id === 'string' && this._options.id !== '')
         {
             this.id = this._options.id;
         }
         else
         {
-            this.id = '' + Math.round(Math.random() * 1000000) + '_' + (new Date().getTime());
+            this.id = '' + Math.round(Math.random() * 1e6);
         }
 
         this._options.zIndex = 0;
@@ -49,32 +54,36 @@
         this._opened = false;
         this._loading = false;
 
-        this._element = $('<div class="mw mw_id_' + this.id + '" />').hide();
-        if (typeof this._options.theme == 'string' && this._options.theme != '')
+        this.$mw = $('<div class="mw mw_id_' + this.id + '" />').hide();
+        if (typeof this._options.theme === 'string' && this._options.theme !== '')
         {
-            this._element.addClass('mw_theme_' + this._options.theme);
+            this.$mw.addClass('mw_theme_' + this._options.theme);
         }
 
-        this._elementInner = $('<div class="mw__inner" />').appendTo(this._element);
-
-        this._elementTitle = $('<div class="mw__title" />').appendTo(this._elementInner);
-        this._elementClose = $('<div class="mw__close" />').appendTo(this._elementInner);
-        this._elementContent = $('<div class="mw__content" />').appendTo(this._elementInner);
-        this._elementLoading = $('<div class="mw__loading" />').appendTo(this._elementInner);
+        this.$inner = $('<div class="mw__inner" />').appendTo(this.$mw);
+        this.$title = $('<div class="mw__title" />').appendTo(this.$inner);
+        this.$close = $('<div class="mw__close" />').appendTo(this.$inner);
+        this.$content = $('<div class="mw__content" />').appendTo(this.$inner);
+        this.$loading = $('<div class="mw__loading" />').appendTo(this.$inner);
 
         var self = this;
-        this._elementClose.on('click.mw', function()
+        this.$close.on('click.mw', function()
         {
             self.close();
         });
 
         this.title(this._options.title);
         this.closeContent(this._options.closeContent);
+
+        this.on('open', this._options.open);
+        this.on('load', this._options.load);
+        this.on('close', this._options.close);
+        this.on('update', this._options.update);
     };
 
     ModalWindow.prototype.content = function(value)
     {
-        if (typeof value != 'undefined')
+        if (typeof value !== 'undefined')
         {
             this._options.content = value;
             if (this._opened)
@@ -88,7 +97,7 @@
 
     ModalWindow.prototype.src = function(value)
     {
-        if (typeof value != 'undefined')
+        if (typeof value !== 'undefined')
         {
             this._options.src = value;
             if (this._opened)
@@ -102,63 +111,67 @@
 
     ModalWindow.prototype.title = function(value)
     {
-        if (typeof value != 'undefined')
+        if (typeof value !== 'undefined')
         {
             if (value === false)
             {
-                this._elementTitle.hide();
+                this.$title.hide();
             }
             else
             {
-                if (typeof value == 'string')
+                if (typeof value === 'string')
                 {
-                    this._elementTitle.html(value);
+	                this._options.title = value;
+                    this.$title.html(value);
                 }
                 else if (value instanceof jQuery)
                 {
-                    this._elementTitle.append(value);
+	                this._options.title = value;
+                    this.$title.empty().append(value);
                 }
-                this._elementTitle.show();
+                this.$title.show();
             }
             return;
         }
-        return this._elementTitle;
+        return this._options.title;
     };
 
     ModalWindow.prototype.closeContent = function(value)
     {
-        if (typeof value != 'undefined')
+        if (typeof value !== 'undefined')
         {
             if (value === false)
             {
-                this._elementClose.hide();
+                this.$close.hide();
             }
             else
             {
-                if (typeof value == 'string')
+                if (typeof value === 'string')
                 {
-                    this._elementClose.html(value);
+	                this._options.closeContent = value;
+                    this.$close.html(value);
                 }
                 else if (value instanceof jQuery)
                 {
-                    this._elementClose.append(value);
+	                this._options.closeContent = value;
+                    this.$close.empty().append(value);
                 }
-                this._elementClose.show();
+                this.$close.show();
             }
             return;
         }
-        return this._elementClose;
+        return this._options.closeContent;
     };
 
     ModalWindow.prototype.zIndex = function(value)
     {
-        if (typeof value != 'undefined')
+        if (typeof value !== 'undefined')
         {
             value = parseInt(value);
             if (!isNaN(value))
             {
                 this._options.zIndex = value;
-                this._element.css('z-index', value);
+                this.$mw.css('z-index', value);
             }
             return;
         }
@@ -172,15 +185,15 @@
 
     ModalWindow.prototype.element = function()
     {
-        return this._element;
+        return this.$mw;
     };
 
-    ModalWindow.prototype.open = function(data, callback)
+    ModalWindow.prototype.open = function(data, options)
     {
-        $.mw.open(this, data, callback);
+        $.mw.open(this, data, options);
     };
 
-    ModalWindow.prototype._open = function(data, callback)
+    ModalWindow.prototype._open = function(data, options)
     {
         if (this._opened)
         {
@@ -188,23 +201,20 @@
         }
         this._opened = true;
 
-        if (this._element.parent().length == 0)
+        if (this.$mw.parent().length === 0)
         {
-            this._element.appendTo($('body'));
+            this.$mw.appendTo('body');
         }
 
-        if (data !== false && data !== null)
-        {
-            this.load(data, true, callback);
-        }
+        this.load(data, options);
 
-        this._element.show();
+        this.$mw.show();
 
         var self = this;
         setTimeout(function()
         {
-            self._element.addClass('mw_opened');
-            self._element.trigger('open', [self, data]);
+            self.$mw.addClass('mw_opened');
+            self.$mw.trigger('open', [self, data]);
         }, 1);
 
         this.update();
@@ -223,13 +233,12 @@
         }
         this._opened = false;
 
-        this._element.removeClass('mw_opened');
+        this.$mw.removeClass('mw_opened');
 
         var self = this;
-
         setTimeout(function()
         {
-            self._element.hide();
+            self.$mw.hide();
 
             if (self._options.content instanceof jQuery)
             {
@@ -240,56 +249,52 @@
                 }
             }
 
-            self._element.trigger('close', [self]);
+            self.$mw.trigger('close', [self]);
 
         }, this._options.closeDelay * 1000);
     };
 
-    ModalWindow.prototype.load = function(data, clear, callback)
+    ModalWindow.prototype.load = function(data, options)
     {
-        if (typeof this._options.src == 'string' && this._options.src != '')
+        if (!$.isPlainObject(options))
+        {
+	        options = {};
+        }
+
+        if (typeof this._options.src === 'string' && this._options.src !== '')
         {
             this.loading(true);
 
-            if (clear === true)
+            if (options.clear === true)
             {
-                this._elementContent.empty();
+                this.$content.empty();
             }
 
             var self = this;
-            this._elementContent.load(this._options.src, data, function()
+            this.$content.load(this._options.src, data, function()
             {
                 self.loading(false);
                 self.update();
-                if ($.isFunction(callback))
-                {
-                    callback.call(self);
-                }
+	            self.$mw.trigger('load', [self, data]);
             });
         }
-        else if (typeof this._options.content == 'string')
+        else if (typeof this._options.content === 'string')
         {
-            this._elementContent.html(this._options.content);
+            this.$content.html(this._options.content);
             this.update();
             this.loading(false);
-            if ($.isFunction(callback))
-            {
-                callback.call(this);
-            }
+	        this.$mw.trigger('load', [this, data]);
         }
         else if (this._options.content instanceof jQuery)
         {
-            if (this._options.content.closest('.mw').length == 0)
+            if (this._options.content.closest('.mw').length === 0)
             {
                 this._options.content.replaceWith('<div class="mw-placeholder" data-mw="' + this.id + '" />');
 
-                this._elementContent.empty().append(this._options.content);
+                this.$content.empty().append(this._options.content);
                 this.update();
                 this.loading(false);
-                if ($.isFunction(callback))
-                {
-                    callback.call(this);
-                }
+	            this.$mw.trigger('load', [this, data]);
             }
         }
     };
@@ -299,17 +304,16 @@
         if (value === true)
         {
             this._loading = true;
-            this._elementLoading.show();
+            this.$loading.show();
+            this.$mw.addClass('mw_loading');
         }
         else if (value === false)
         {
             this._loading = false;
-            this._elementLoading.hide();
+            this.$loading.hide();
+	        this.$mw.removeClass('mw_loading');
         }
-        else
-        {
-            return this._loading;
-        }
+        return this._loading;
     };
 
     ModalWindow.prototype.opened = function()
@@ -324,7 +328,9 @@
             return;
         }
 
-        var top, left, width, height, offsetX, offsetY;
+        var top, left, width, height, offsetX, offsetY,
+            windowWidth = $(window).width(),
+            windowHeight = $(window).height();
 
         if ($.isPlainObject(this._options.offset))
         {
@@ -345,85 +351,75 @@
             offsetY = 0;
         }
 
-        this._element.css('width', '');
-        if (this._options.width == 'auto')
+        if (this._options.width === 'auto')
         {
-            width = this._element.outerWidth();
+	        this.$mw.css('width', '');
         }
         else
         {
-            this._element.css('width', this._options.width);
-            width = this._element.outerWidth();
+            this.$mw.css('width', this._options.width);
         }
-
-        this._element.css('height', '');
-        if (this._options.height == 'auto')
+	    width = this.$mw.outerWidth();
+        if ((width + 2 * offsetX) > windowWidth)
         {
-            if (this._options.position == 'fixed')
+	        width = windowWidth - 2 * offsetX;
+        }
+	    this.$mw.css('width', width);
+
+        if (this._options.height === 'auto')
+        {
+	        this.$mw.css('height', '');
+            if (this._options.position === 'fixed')
             {
-                height = Math.min($(window).height() - 2 * offsetY, this._element.outerHeight());
-                this._element.css('height', height + 'px');
+                height = Math.min(windowHeight - 2 * offsetY, this.$mw.outerHeight());
+                this.$mw.css('height', height);
             }
             else
             {
-                height = this._element.outerHeight();
+                height = this.$mw.outerHeight();
             }
         }
         else
         {
-            this._element.css('height', this._options.height);
-            height = this._element.outerHeight();
+            this.$mw.css('height', this._options.height);
+            height = this.$mw.outerHeight();
         }
 
-        if (this._options.position == 'fixed')
+	    left = (windowWidth - width) / 2;
+
+	    top = (windowHeight - height) / 2;
+	    if (top < offsetY)
+	    {
+		    top = offsetY;
+	    }
+
+        if (this._options.position === 'fixed')
         {
-            left = ($(window).width() - width) / 2;
-            if (left < offsetX)
-            {
-                left = offsetX;
-            }
-
-            top = ($(window).height() - height) / 2;
-            if (top < offsetY)
-            {
-                top = offsetY;
-            }
-
-            this._element.css({
-                'position' : 'fixed',
-                'left' : left + 'px',
-                'top' : top + 'px'
+            this.$mw.css({
+                position: 'fixed',
+                left: left + 'px',
+                top: top + 'px'
             });
         }
-        else if (this._options.position != 'auto')
+        else
         {
-            left = ($(window).width() - width) / 2;
-            if (left < offsetX)
-            {
-                left = offsetX;
-            }
+            top += $(window).scrollTop();
 
-            top = $(window).scrollTop() + ($(window).height() - height) / 2;
-            if (top < offsetY)
-            {
-                top = offsetY;
-            }
-
-            this._element.css({
-                'position' : 'absolute',
-                'left' : left + 'px',
-                'top' : top + 'px'
+            this.$mw.css({
+                position: 'absolute',
+                left: left + 'px',
+                top: top + 'px'
             });
         }
 
-        this._element.trigger('update', [self]);
+        this.$mw.trigger('update', [this]);
     };
 
     ModalWindow.prototype.on = function(event, handler)
     {
-        if (typeof event == 'string' && $.isFunction(handler))
+        if (typeof event === 'string' && $.isFunction(handler))
         {
-            this._element.on(event, handler);
+            this.$mw.on(event, handler);
         }
 
         return this;
@@ -431,9 +427,9 @@
 
     ModalWindow.prototype.off = function(event, handler)
     {
-        if (typeof event == 'string')
+        if (typeof event === 'string')
         {
-            this._element.off(event, handler);
+            this.$mw.off(event, handler);
         }
 
         return this;
@@ -441,7 +437,7 @@
 
     var ModalWindowManager = function()
     {
-        this._elementOverlay = $('<div class="mw-overlay" />');
+        this.$overlay = $('<div class="mw-overlay" />');
 
         this._defaults = null;
 
@@ -449,18 +445,14 @@
         this._stack = [];
 
         this._startZIndex = 3000;
-        this._zIndex = this._startZIndex;
+        this._zIndex = null;
 
         this._closeDisabled = false;
 
         var self = this;
-        this._elementOverlay.on('click.mw', function()
+        this.$overlay.on('click.mw', function()
         {
-            var l = self._stack.length;
-            if (l > 0)
-            {
-                self.close(self._stack[l - 1]);
-            }
+            self.closeAll();
         });
 
         $(window).on('resize.mw', function()
@@ -475,6 +467,15 @@
                 }
             }
         });
+    };
+
+	ModalWindowManager.prototype.startZIndex = function(value)
+    {
+	    value = parseInt(value);
+	    if (!isNaN(value))
+        {
+            this._startZIndex = value;
+        }
     };
 
     ModalWindowManager.prototype.defaults = function(options)
@@ -502,7 +503,7 @@
         }
         if (mw instanceof ModalWindow)
         {
-            if (typeof mw.id == 'string' && mw.id != '')
+            if (typeof mw.id === 'string' && mw.id !== '')
             {
                 if (!this._mw.hasOwnProperty(mw.id))
                 {
@@ -515,7 +516,7 @@
 
     ModalWindowManager.prototype.get = function(mw, callback)
     {
-        if (typeof mw == 'string' && mw != '')
+        if (typeof mw === 'string' && mw !== '')
         {
             if (this._mw.hasOwnProperty(mw))
             {
@@ -527,8 +528,8 @@
                 if (content.length > 0)
                 {
                     this.add({
-                        'id' : mw,
-                        'content' : content
+                        id: mw,
+                        content: content
                     });
 
                     if (this._mw.hasOwnProperty(mw))
@@ -544,7 +545,7 @@
             mw = null;
         }
 
-        if (typeof callback == 'undefined')
+        if (typeof callback === 'undefined')
         {
             return mw;
         }
@@ -559,7 +560,7 @@
         return this;
     };
 
-    ModalWindowManager.prototype.open = function(mw, data, callback, close)
+    ModalWindowManager.prototype.open = function(mw, data, options)
     {
         mw = this.get(mw);
         if (mw === null)
@@ -572,16 +573,26 @@
             return this;
         }
 
+        if (!$.isPlainObject(options))
+        {
+	        options = {};
+        }
+
+        if (this._zIndex === null)
+        {
+	        this._zIndex = this._startZIndex;
+        }
+
         this._stack.push(mw);
 
         this._showOverlay();
 
         mw.zIndex(this._zIndex + 1);
-        mw._open(data, callback);
+        mw._open(data, options);
 
         this._zIndex += 2;
 
-        if (close === true)
+        if (options.close === true)
         {
             var i = this._stack.length;
             if (i > 1)
@@ -690,48 +701,48 @@
         if (l > 0)
         {
             theme = this._stack[l - 1].theme();
-            if (typeof theme == 'string' && theme != '')
+            if (typeof theme === 'string' && theme !== '')
             {
                 theme = 'mw-overlay_theme_' + theme;
             }
         }
 
-        if (theme != '')
+        if (theme !== '')
         {
-            if (!this._elementOverlay.hasClass(theme))
+            if (!this.$overlay.hasClass(theme))
             {
-                this._elementOverlay
+                this.$overlay
                     .removeClass()
                     .addClass('mw-overlay ' + theme);
             }
         }
         else
         {
-            this._elementOverlay
+            this.$overlay
                 .removeClass()
                 .addClass('mw-overlay');
         }
 
-        if (this._elementOverlay.parent().length == 0)
+        if (this.$overlay.parent().length === 0)
         {
-            this._elementOverlay.appendTo($('body'));
+            this.$overlay.appendTo('body');
         }
 
-        this._elementOverlay.css('z-index', this._zIndex);
+        this.$overlay.css('z-index', this._zIndex);
 
-        if (this._elementOverlay.hasClass('mw-overlay__opened'))
+        if (this.$overlay.hasClass('mw-overlay_opened'))
         {
-            this._elementOverlay.show();
+            this.$overlay.show();
         }
         else
         {
-            this._elementOverlay.addClass('mw-overlay__opened').fadeIn();
+            this.$overlay.addClass('mw-overlay_opened').fadeIn();
         }
     };
 
     ModalWindowManager.prototype._hideOverlay = function()
     {
-        this._elementOverlay.removeClass('mw-overlay__opened').fadeOut();
+        this.$overlay.removeClass('mw-overlay_opened').fadeOut();
     };
 
     $.mw = new ModalWindowManager();
