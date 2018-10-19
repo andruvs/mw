@@ -1,23 +1,23 @@
 # mw
 jQuery Modal Windows
 
-Плагин для создания модальных окон на сайте на основе jQuery.
+This is a cute plugin for creating modal windows using a jQuery on your website.
 
-## Начало работы
+## Quick start
 
-Подключите jQuery, mw.js и стили для нужной темы оформления.
+Include the jQuery library, out mw.js and CSS styles for the required modal window theme.
 
-## Использование
+## Usage
 
-Для создания нового окна необходимо добавить его в менеджер модальных окон. Менеджер позволяет управлять всеми окнами, добавленными на страницу сайта. Также менеджер позволяет задать параметры окна по-умолчанию.
+If you want to create a modal window you firstly have to add it to modal window manager. The manager allows to manage all of the windows added to the website page. This manager also allows you to set default parameters for all windows.
 
-Менеджер доступен через *$.mw*
+This manager can be called using *$.mw*
 
-### Параметры по-умолчанию
+### Default parameters
 
-Если необходимо задать общие параметры окон по-умолчанию, чтобы не добавлять их для каждого окна, то это можно сделать с помощью менеджера. Все окна, добавленные после вызова *$.mw.defaults()*, будут использовать эти параметры как значения по-умолчанию.
+If you want to set default parameters for all modal windows, firstly use method *#.mw.defaults()*. All of the windows added after `defaults()` method will inherit the parameters as default. 
 
-Любой параметр по-умолчанию может быть переопределен, если указать его при добавлении окна в менеджер.
+All of the default parameters can be overridden by *$.mw.add* method.
 
 ```javascript
 $(function () {
@@ -34,9 +34,9 @@ $(function () {
 });
 ```
 
-### Добавление окон
+### Adding the windows
 
-Все окна, которые предполагается использовать на странице, необходимо добавить в менеджер:
+All of the modal windows for the page have to be added to the manager:
 
 ```javascript
 $(function () {
@@ -64,37 +64,38 @@ $(function () {
 });
 ```
 
-### Параметры окон
+### Window Parameters
 
 ###### id {String}
 
-Идентификатор окна. Должен быть уникальным. Используется в дальнейшем для открытия и получения экземпляра окна с помощью менеджера.
+The window identifier. It must be unique. It's used for window opening or getting the instance of window from the manager.
 
 ###### theme {String}
 
-Тема окна. Реализуется посредством стилей.
+The window theme. It's implemented using CSS styles.
 
 ###### src {String}
 
-Путь для загрузки содержимого окна. Если задан, то при открытии окна содержимое окна будет загружено по этом пути посредством ajax запроса. Метод запроса GET или POST определяется автоматически в зависимости от указанных параметров открытия окна.
+The path for loading the window contents. If it's set, the window contents will be loaded using AJAX during the window opening. The request method (GET or POST are supported) depends on the parameters of *$.mw.open* method.
 
 ###### content {jQuery selector, String}
 
-Если *src* не задан, то селектор *content* будет использован в качестве содержимого окна. Если *content* строка, то она будет использована как html содержимого окна.
+If the parameter *src* is not set, selector *content* will be used as the window contents. If the *content* is string, it'll be used as window html contents.
 
 ###### width {Number, String}
 
-Ширина окна по-умолчанию. Может быть просто числом - значение в пикселях, а также возможны строковые варианты: *'200px'*, *'60%'*
+Default window width. It can be set both as number (value in pixels) and as string like *'200px'* or *'60%'*
 
 ###### height {Number, String}
 
-Высота окна. Может быть просто числом - значение в пикселях, а также возможны строковые варианты: *'200px'*, *'60%'*
+The window height. It can be set both as number (value in pixels) and as string like *'200px'* or *'60%'*
 
-Обычно не указывается.
+This parameter is used seldom because of the window variable height that depends on the contents.
 
 ###### offset {Number, Object}
 
-Отступ окна от краев окна браузера. Если число, то оно задает одинаковый отступ по вертикали и горизонтали в пикселях. Если передать объект, то можно задать разные отступы по вертикали и горизонтали:
+Indent of the window from the browser edges. The number sets the same indent both horizontal and vertical directions. You can also set it as the object and set different values for horizontal and vertical indent:
+
 
 ```javascript
 offset: {
@@ -105,39 +106,39 @@ offset: {
 
 ###### title {jQuery selector, String, Boolean}
 
-Заголовок окна. Если *false*, то заголовок по-умолчанию скрыт.
+The window title. If it's set to *false* title is hidden.
 
-### Открытие окна
+### Opening the window
 
-Для открытия окна необходимо использовать метод менеджера:
+You can use the manager's method:
 
 *$.mw.open(mw, data);*
 
 ###### mw {String}
 
-Идентификатор окна, которое необходимо открыть.
+The window identifier you want to open.
 
 ###### data {String}
 
-Дополнительные параметры, которые будут переданы вместе с ajax запросом при запросе соедржимого окна. Актуально только при использовании параметра *src*. Если указана строка (*param=value*), то содержимое окна будет запрошено методом GET, если объект - то POST.
+Additional request parameters getting the window contents. It's usually used when *src* parameter is set. If this parameter is set as a string (*param=value&foo=bar*), window contents will be requested using GET, and POST for the object.
 
-Пример:
+For example:
 
 ```javascript
 $.mw.open('callback', {
 	param1: 'value1',
 	param2: 'value2'
-});
+}); // POST request will be called
 ```
 
-### Закрытие окна
+### Window closing
 
-Обычно закрытие окна осуществляется пользователем при клике на кнопку "Закрыть" или при клике на затенении. Но если требуется закрыть окно через код, то можно воспользоваться следующими методами:
+The modal window is usually closed by user clicking the "close" button or the window overlay. You can also use this method can be used to close the modal window programmatically.
 
 *$.mw.close(mw);*
 
-Закрывает окно по его идентификатору.
+This method closes the window with it's identifier.
 
 *$.mw.closeAll();*
 
-Закрывает все открытые окна.
+This method closes all opened modal windows.
