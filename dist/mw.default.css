@@ -14,7 +14,7 @@
 	-o-transition: opacity 0.3s ease-out 0.3s;
 	transition: opacity 0.3s ease-out 0.3s, transform 0.3s ease-out 0.3s;
 }
-.mw_theme_default.mw_opened {
+.mw_theme_default.mw_state_opened {
 	opacity: 1;
 	-webkit-transform: translateY(0);
 	-moz-transform: translateY(0);
