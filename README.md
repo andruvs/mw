@@ -5,30 +5,30 @@ Library for creating modal windows on the site based on jQuery plugin.
 
 ## Getting Started
 
-Include the js and css files which you can find in the dist folder. Убедитесь, что на сайте подключена библиотека jQuery (>= 3.x.x)
+Include the js and css files which you can find in the dist folder. You need to be sure that you've included a correct version of jQuery library. (>= 3.x.x)
 
 ```
 <link rel="stylesheet" href="dist/mw.default.css" />
 <script src="dist/mw.min.js"></script>
 ```
 
-## Темы оформления
+## Window themes
 
-Внешний вид окна определяется темой оформления. Тема - это набор CSS стилей, которые реализуют конкретную тему оформления окна. Каждая тема определяется уникальным символьным идентификатом, например, `default` или `white-round-window`. Тема по-умолчанию задается при создании окна. При необходимости тему можно сменить во время открытия окна. Пример реализации темы оформления окна можно посмотреть в файле `dist/mw.default.css`.
+The modal window design is described with the theme. Theme is a part of CSS styles. Every theme is defined with unique symbolic identifier. For example, `default` or `white-round-window`. The default theme is set creating the window. The window theme can be changed opening the window. The theme example can be seen inside the `dist/mw.default.css` file.
 
-### Структура верстки окна
+### HTML layout structure
 
-Во время создания окна библиотека генерирует следующий каркас окна и добавляет его в `$('body')`:
+This library creates the window skeleton during the window creating and adds it to `$('body')`:
 
 ```html
-<div class="mw mw_id_{{ Идентификатор окна }} mw_theme_{{ Символьный код темы }} mw_state_{{ Символьный код состояния окна }}">
+<div class="mw mw_id_{{ window id }} mw_theme_{{ Theme code }} mw_state_{{ window state code }}">
     <div class="mw__inner">
         <div class="mw__title">
-            {{ Заголовок окна }}
+            {{ Window title }}
         </div>
         <div class="mw__close"></div>
         <div class="mw__content">
-            {{ Контент окна }}
+            {{ Window contents }}
         </div>
         <div class="mw__loading"></div>
     </div>
@@ -37,11 +37,11 @@ Include the js and css files which you can find in the dist folder. Убедит
 
 ## Usage
 
-Modal windows are controlled by the window manager which is accessible in code via `$.mw`. Each modal window used on the page must be added to the window manager. The window manager allows you to open, close windows, display windows on top of each other, and also set the default parameters.
+Modal windows are controlled by the window manager that can be accessed using `$.mw`. Each modal window on the page has to be added to the window manager. The window manager allows you to open, close windows, display windows on top of each other, and also set the default parameters.
 
 ### Default parameters
 
-Using the window manager method `$.mw.defaults()`, you can set the common default parameters of the windows so that you do not specify them when creating each window. All windows added after calling `$.mw.defaults()` will use these parameters as default values.
+You can set the default parameters for all windows using the method `$.mw.defaults()`. All of the windows added after calling `$.mw.defaults()` will inherit these parameters as default values.
 
 Any default parameter can be overridden when adding a window to the manager.
 
@@ -60,7 +60,7 @@ $(function () {
 });
 ```
 
-Также имеется возможность задать параметры по умолчанию для каждой темы отдельно (или сразу для нескольких тем). Для этого первым параметром необходимо передать символьный идентификатор темы или массив символьных идентификаторв, а вторым параметры по-умолчанию:
+You can set default parameters for every theme individually or you can also set it for theme suit. Just set the first parameter of `$.mw.defaults()` with the theme name of it's suit, and the second parameter is the default parameters:
 
 ```javascript
 $(function () {
@@ -75,7 +75,7 @@ $(function () {
 });
 ```
 
-Таким образом можно определить общие настройки для всех тем оформления, а затем задать уточняющие параметры для каждой отдельной темы:
+You can set default parameters for all created themes and set the parameters for specific theme inheriting default values.
 
 ```javascript
 $(function () {
@@ -120,7 +120,7 @@ $(function () {
             id: 'callback',
             src: '/widgets/callback/',
             width: 600,
-            title: 'Перезвоните мне'
+            title: 'Call me now!'
         });
 });
 ```
@@ -138,20 +138,20 @@ height | integer &#124; string | 'auto' | The height of the window. If the value
 offset | integer &#124; object | 50 | Minimum space between viewport and modal window. Can be set as object `{x: 20, y: 50}`
 title | jQuery selector &#124; string &#124; boolean | true | The title of the window. If the `title` parameter is boolean, then the title will be shown or hidden depending on the value.
 closeContent | jQuery selector &#124; string &#124; boolean | true | Allows to specify custom contents of the window close button. For example `<span class="close-button">Close window</span>`. If the `closeContent` parameter is boolean, then the close button will be shown or hidden depending on the value.
-closingDuration | integer | 0 | Длительность закрытия окна в секундах. Этот параметр может быть использован для анимации эффекта закрытия окна с помощью CSS стилей.
-openingDuration | integer | 0 | Длительность открытия окна в секундах. Этот параметр может быть использован для анимации эффекта открытия окна с помощью CSS стилей.
-opening | function | null | Функция обратного вызова, которая вызывается перед открытием окна.
-open | function | null | Функция обратного вызова, которая вызывается после открытия окна.
-load | function | null | Функция обратного вызова, которая вызывается после загрузки содержимого окна.
-closing | function | null | Функция обратного вызова, которая вызывается перед закрытием окна.
-close | function | null | Функция обратного вызова, которая вызывается после закрытия окна.
-update | function | null | Функция обратного вызова, которая вызывается после обновления размеров и положения окна.
+closingDuration | integer | 0 | The closing animation duration. In seconds. This parameter can be used for animated window closing using CSS.
+openingDuration | integer | 0 | The opening animation duration. In seconds. This parameter can be used for animated window opening using CSS.
+opening | function | null | The callback function fired before the window opening.
+open | function | null | The callback function fired after the window opening.
+load | function | null | The callback function fired after getting the window contents.
+closing | function | null | The callback function fired before the window closing.
+close | function | null | The callback function fired after the window closing.
+update | function | null | The callback function fired after the modal window resite or after changing it's position.
 
-### Методы менеджера окон
+### Window manager methods
 
-Methods are called on manager instances `$.mw`:
+Methods are called on manager instance `$.mw`:
 
-#### Открытие окон
+#### Opening the window
 
 ```javascript
 $.mw.open(id, data, options);
@@ -159,14 +159,14 @@ $.mw.open(id, data, options);
 
 Option | Type | Description
 ------ | ---- | -----------
-id* | string |The identifier of the window. Обязательный параметр.
-data | string &#124; object | A plain object or string that is sent to the server with the request. Используется для окон, у которых содержимое загружается посредством ajax.
-options | object | Параметры открытия окна. Может содержать следующие ключи:
-∟&nbsp;theme | string | Новая тема окна.
-∟&nbsp;close | boolean | Если `true`, то будут закрыты все остальные окна. В противном случае окно будет открыто поверх других открытых окон.
-∟&nbsp;clear | boolean | Если `true`, то перед загрузкой содержимого окна старый контент будет сразу удален.
+id* | string | The window identifier. This is a required parameter.
+data | string &#124; object | A plain object or string that is sent to the server with the request. This parameter is used for windows gettings the contents using AJAX.
+options | object | Opening window parameters. It can contain these keys:
+∟&nbsp;theme | string | Window theme.
+∟&nbsp;close | boolean | If it's set to `true`, other modal windows will be closwd. Otherwise the new window will be opened on the top of all opened windows.
+∟&nbsp;clear | boolean | If it's set to `true`, old window contents will be fully cleared.
 
-Пример:
+Example:
 
 ```javascript
 $.mw.open('callback',
@@ -180,47 +180,48 @@ $.mw.open('callback',
 );
 ```
 
-или
+OR
 
 ```html
-<a href="javascript:void(0);" onclick="$.mw.open('feedback', {param: 12345});">Открыть окно</a>
+<a href="javascript:void(0);" onclick="$.mw.open('feedback', {param: 12345});">Open the window!</a>
 ```
 
-#### Закрытие окон
+#### Window closing
 
-Обычно закрытие окна осуществляется пользователем при клике на кнопку "Закрыть" или при клике на overlay под окном. Но если требуется закрыть окно программно, то можно воспользоваться следующими методами:
-
-```javascript
-$.mw.close(id); // Закрывает окно по его идентификатору
-```
+The user is used to close the window clicking on "close" button or clicking the overlay.
+But if you want to close the window programmatically, you can use these methods:
 
 ```javascript
-$.mw.closeAll(); // Закрывает все открытые окна
-```
-
-#### Блокирование закрытия окна
-
-Бывают ситуации, когда необходимо заблокировать возможность закрытия окна пользователем. Например, если требуется сделать окно с подтверждением возрастного ограничения. Для этого можно воспользоваться следующими методами:
-
-```javascript
-$.mw.disableClose(); // Запретить закрытие окон
+$.mw.close(id); // Method closes the window with it's identifier
 ```
 
 ```javascript
-$.mw.enableClose(); // Разрешить закрытие окон
+$.mw.closeAll(); // This method closes all opened windows
+```
+
+#### Blocking window closing
+
+The real modal window requires user's target action. For example, age confirmation. If you have to do this, you can use this method:
+
+```javascript
+$.mw.disableClose(); // Disable window closing
+```
+
+```javascript
+$.mw.enableClose(); // Enable window closing
 ```
 
 #### z-index
 
-По-умолчанию библиотека использует значение `z-index: 3000`. Если требуется изменить это значение, то можно воспользоваться методом:
+The default value for the modal window container is `z-index: 3000`. If you have to change this value, you can use the method: 
 
 ```javascript
 $.mw.startZIndex(value);
 ```
 
-#### Экземпляр окна
+#### Window instance
 
-Экземпляр окна можно получить с помощью менеджера окон по его идентификатору:
+The window instance can be get using the window manager by it's identifier:
 
 ```javascript
 $.mw.get(id, callback);
@@ -228,10 +229,10 @@ $.mw.get(id, callback);
 
 Option | Type | Description
 ------ | ---- | -----------
-id* | string | The identifier of the window. Обязательный параметр.
-callback | function | Функция обратного вызова. В качестве первого параметра в функцию будет передан экземпляр окна. В качестве `this` будет установлен контейнер окна `<div class="mw" />`.
+id* | string | The identifier of the window. This is a required parameter.
+callback | function | The callback function. It's first argument is modal window instance, and the callee context is the window container `<div class="mw" />`.
 
-Данный метод удобно использовать для окон, содержимое которых загружается динамически посредством ajax. В этом случае можно инкапсулировать скрипты, инициализирующие содержимое окна, в загружаемом файле:
+The best practice is to use this method for windows that load the contents using AJAX. You can encapsulate the scripts and window logic inside the loading contents:
 
 ```javascript
 $(function () {
@@ -245,7 +246,7 @@ $(function () {
             id: 'window',
             src: '/ajax/window.html',
             width: 600,
-            title: 'Пример окна с динамическим содержимым'
+            title: 'Window example with dynamic contents'
         });
     
     $.mw.open('window');
@@ -255,9 +256,9 @@ $(function () {
 ```html
 <!-- /ajax/window.html -->
 <p>
-    Контент окна
+    The window contents
 </p>
-<button type="button">Закрыть окно</button>
+<button type="button">Close this window!</button>
 
 <script type="text/javascript">
     $.mw.get('window', function (mw) {
@@ -268,76 +269,77 @@ $(function () {
 </script> 
 ```
 
-### Методы экземпляра окна
+### Window instance methods
 
-Методы окна вызываются на его экземпляре, который может быть получен с помощью менеджера `$.mw.get(id, callback)`:
+These methods can be called from it's instance. It can be get using a manager `$.mw.get(id, callback)`:
 
 ```javascript
 $.mw.get('window', function (mw) {
-    mw.title('Заголовок окна');
+    mw.title('This is a window title');
     mw.load({param1: 'value1'});
 });
 
 // or
 
 var mw = $.mw.get('window');
-mw.title('Заголовок окна');
+mw.title('This is a window title');
 ```
 
 Method | Argument | Description
------- | ---- | -----------
-`content` | value:(jQuery selector &#124; string) | Метод позволяет получить текущее значение параметра `content` (если не передан параметр `value`) или установить новое значение. Если устанавливается новое значение и окно в данный момент открыто, то содержимое окна будет сразу перезагружено.
-`src` | value:(jQuery selector &#124; string) | Метод позволяет получить текущее значение параметра `src` (если не передан параметр `value`) или установить новое значение. Если устанавливается новое значение и окно в данный момент открыто, то содержимое окна будет сразу перезагружено.
-`title` | value:(jQuery selector &#124; string &#124; boolean) | Метод позволяет получить текущее значение параметра `title` (если не передан параметр `value`) или установить новое значение. Если передано `false`, то заголовок будет скрыт, в противном случае заголовок будет показан.
-`closeContent` | value:(jQuery selector &#124; string &#124; boolean) | Метод позволяет получить текущее значение параметра `closeContent` (если не передан параметр `value`) или установить новое значение. Если передано `false`, то кнопка закрытия окна будет скрыта, в противном случае кнопка будет показана.
-`open` | data:(string &#124; object)<br />options:object | Метод позволяет открыть окно. Параметры аналогичны методу `$.mw.open()`.
-`close` |  | Метод позволяет закрыть окно.
-`load` | data:(string &#124; object)<br />options:object | Метод позволяет перезагрузить содержимое окна. Данный метод удобно использовать, если, например, в окне выводится форма и ее необходимо отправить на сервер.
-`loading` | value:boolean | Метод позволяет получить текущее значение параметра `loading` (если не передан параметр `value`) или установить новое значение. Если устанавливается новое значение, то `true/false` включает/выключает индикацию загрузки окна.
-`opened` |  | Возвращает `true`, если окно в данный момент открыто и `false` в противном случае.
-`update` |  | Вызывает принудительный перерасчет размеров и положения окна. Данный метод удобно использовать, если содержимое окна меняется программно, и необходимо обновить положение окна после изменений.
-`on` | event:string<br />handler:function | Метод позволяет повесить обработчик на событие окна.
-`off` | event:string<br />handler:function | Метод позволяет снять обработчик на событие окна.
+------ | -------- | -----------
+`content` | value:(jQuery selector &#124; string) | This method allows you to get the current value of `content` (if you didn't set the parameter `value`) or set the new value. If you set the new value for the opened window, window contents will be reloaded immediately.
+`src` | value:(jQuery selector &#124; string) | This method allows you both to get and to set the value of parameter `src`. If you set the new value for the opened window, window contents will be reloaded immediately.
+`title` | value:(jQuery selector &#124; string &#124; boolean) | This method allows you both to get and to set the value of parameter `title`. If you set the method's first argument to `false`, the title will be hidden. Otherwise the title will be shown.
+`closeContent` | value:(jQuery selector &#124; string &#124; boolean) | This method allows you both to get and to set the value of parameter `closeContent`. If you set it to `false` the close button will be hidden. Otherwise it will be shown.
+`open` | data:(string &#124; object)<br />options:object | This method allows to open the window. Arguments are the same as for `$.mw.open()`.
+`close` |  | This method closes the current window.
+`load` | data:(string &#124; object)<br />options:object | This method allows to reload the window contents. Best practice of usage is sending the forms from modal window to the webserver.
+`loading` | value:boolean | This method allows you both to get and to set the value of parameter `loading`. If you set the new value to `true/false` it'll turn on/off the loading indication.
+`opened` |  | Returns the open window state. `true` if it's opened now and `false` otherwise.
+`update` |  | This method recalculates both window size and position. It can be useful changing the the window contents programmatically. 
+`on` | event:string<br />handler:function | Method allows to bind the handler on the window's event.
+`off` | event:string<br />handler:function | Method allows to unbind the handler on the window's event.
 
-### События
 
-Существует несколько способов подписаться на события окна:
+### Events
+
+There are some wayt to subscribe to window events:
 
 ```javascript
-// подписка во время создания окна
+// binding the events creating the window..
 $.mw.add({
     id: 'window',
     src: '/ajax/window.html',
     width: 600,
     open: function (mw) {
-    	console.log('Окно открыто!', mw.opened());
+    	console.log('The window is opened!', mw.opened());
     },
     close: function (mw) {
-    	console.log('Окно закрыто!', mw.opened());
+    	console.log('The window is closed!', mw.opened());
     }
 });
 
-// подписка с помощью методов экземпляра окна
+// binding the events using a insance's method..
 var mw = $.mw.get('window');
 mw.on('open', function (mw) {
-    console.log('Окно открыто!', mw.opened());
+    console.log('The window is opened too!', mw.opened());
 });
 
-// подписка с помощью контейнера окна
+// binding the events using a jQuery selector of the window container:
 $.mw.get('window', function (mw) {
     $(this).off('close').on('close', function () {
-    	console.log('Окно закрыто!');
+    	console.log('The window is closed too!');
     });
 });
 ```
 
-> В последнем примере перед подпиской на событие вызывается `$(this).off('close')`. Следует помнить, что контейнер окна никогда не уничтожается и если подписка на событие происходит при каждом открытии окна, то обработчики событий будет накапливаться. Поэтому в примере происходит отписка от прослушивания события.
+> You can see `$(this).off('close')` in the last example. Don't forget the container is never destroyed and if the binding happens on every window open, the handler's stack will be filled with the same handlers. So, just clear it! 
 
 Event | Params | Description
 ------ | ---- | -----------
-opening | mw, data | Функция обратного вызова, которая вызывается перед открытием окна.
-open | mw, data | Функция обратного вызова, которая вызывается после открытия окна.
-load | mw, data | Функция обратного вызова, которая вызывается после загрузки содержимого окна.
-closing | mw | Функция обратного вызова, которая вызывается перед закрытием окна.
-close | mw | Функция обратного вызова, которая вызывается после закрытия окна.
-update | mw | Функция обратного вызова, которая вызывается после обновления размеров и положения окна.
+opening | mw, data | The callback function fired before window opening.
+open | mw, data | The callback function fired after window opening.
+load | mw, data | The callback function fired after window contents loading.
+closing | mw | The callback function fired before window closing.
+close | mw | The callback function fired after window closing.
+update | mw | The callback function fired after window resize or changing the position.
