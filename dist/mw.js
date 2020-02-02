@@ -1,5 +1,5 @@
 /**
- * ModalWindow 2.6.1
+ * ModalWindow 2.6.2
  * JQuery plugin for creating modal windows
  * https://github.com/andruvs/mw
  *
@@ -85,10 +85,10 @@
 
 		this.theme(this._options.theme);
 
-		this.on('opening', this._options.open);
+		this.on('opening', this._options.opening);
 		this.on('open', this._options.open);
 		this.on('load', this._options.load);
-		this.on('closing', this._options.close);
+		this.on('closing', this._options.closing);
 		this.on('close', this._options.close);
 		this.on('update', this._options.update);
 	};
