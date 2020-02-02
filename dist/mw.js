@@ -300,7 +300,8 @@
 				var $placeholder = $('.mw-placeholder[data-mw="' + self.id + '"]');
 				if ($placeholder.length > 0)
 				{
-					$placeholder.replaceWith(self._options.content);
+					self._options.content.insertAfter($placeholder);
+					$placeholder.remove();
 				}
 			}
 
@@ -343,7 +344,7 @@
 		{
 			if (this._options.content.closest('.mw').length === 0)
 			{
-				this._options.content.replaceWith('<div class="mw-placeholder" data-mw="' + this.id + '" />');
+				$('<div class="mw-placeholder" data-mw="' + this.id + '" />').insertAfter(this._options.content);
 
 				this.$content.empty().append(this._options.content);
 				this.update();
