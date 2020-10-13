@@ -1,11 +1,11 @@
 /**
- * ModalWindow 2.6.2
+ * ModalWindow 2.6.3
  * JQuery plugin for creating modal windows
  * https://github.com/andruvs/mw
  *
- * Copyright 2016-2017, Andrew Golovchak
+ * Copyright 2016-2020, Andrew Golovchak
  *
- * Released on: February 22, 2018
+ * Released on: October 13, 2020
  */
 
 (function($){
@@ -512,18 +512,28 @@
 				self.close(self._stack[l - 1]);
 			}
 		});
+		
+		var width = $(window).width(),
+			tid = null;
 
 		$(window).on('resize.mw', function()
 		{
-			var id, mw;
-			for (id in self._mw)
-			{
-				mw = self._mw[id];
-				if (mw.opened())
-				{
-					mw.update();
+			clearTimeout(tid);
+			setTimeout(function () {
+				var newWidth = $(window).width();
+				if (width !== newWidth) {
+					width = newWidth;
+					var id, mw;
+					for (id in self._mw)
+					{
+						mw = self._mw[id];
+						if (mw.opened())
+						{
+							mw.update();
+						}
+					}
 				}
-			}
+			}, 100);
 		});
 	};
 
